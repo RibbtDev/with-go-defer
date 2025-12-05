@@ -1,5 +1,5 @@
 {
-    "name": "with-defer",
+    "name": "with-go-defer",
     "version": "1.0.0",
     "description": "Go-style defer functionality for JavaScript. Declare cleanups right next to resource acquisition.",
     "scripts": {
@@ -24,9 +24,9 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/RibbtDev/with-defer"
+        "url": "https://github.com/RibbtDev/with-go-defer"
     },
-    "homepage": "https://github.com/RibbtDev/ordinary-arg-parser",
+    "homepage": "https://github.com/RibbtDev/with-go-defer",
     "license": "MIT",
     "type": "module",
     "main": "./dist/cjs/index.js",

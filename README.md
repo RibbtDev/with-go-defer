@@ -1,15 +1,15 @@
-# defer.js
+# with-go-defer
 
 Go-style defer functionality for JavaScript and TypeScript. Declare cleanups right next to resource acquisition, and they'll execute automatically in the correct order when your function exits.
 
 ## Quick Start
 
 ```bash
-npm install with-defer
+npm install with-go-defer
 ```
 
 ```javascript
-import { withDefer } from 'with-defer';
+import { withDefer } from 'with-go-defer';
 
 await withDefer(async (defer) => {
   const file = openFile('data.txt');
