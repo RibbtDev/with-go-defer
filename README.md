@@ -93,7 +93,8 @@ function withDefer<T>(
 **Parameters:**
 - `fn` - Function receiving a `defer` callback for registering cleanup functions
 
-**Returns:** Promise resolving to the return value of `fn`
+**Returns:** 
+- Promise resolving to the return value of `fn`
 
 **Behavior:**
 - Deferred functions execute in reverse order (last deferred runs first)
