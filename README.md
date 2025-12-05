@@ -1,15 +1,15 @@
 # defer.js
 
-Go-style defer functionality for JavaScript and TypeScript. Declare cleanup functions right next to resource acquisition, and they'll execute automatically in the correct order when your function exits.
+Go-style defer functionality for JavaScript and TypeScript. Declare cleanups right next to resource acquisition, and they'll execute automatically in the correct order when your function exits.
 
 ## Quick Start
 
 ```bash
-npm install defer.js
+npm install with-defer
 ```
 
 ```javascript
-import { withDefer } from 'defer.js';
+import { withDefer } from 'with-defer';
 
 await withDefer(async (defer) => {
   const file = openFile('data.txt');
@@ -78,95 +78,6 @@ await withDefer((defer) => {
 
 **Refactoring safety.** Add early returns or change control flow without updating cleanup code. The cleanup you declared keeps working.
 
-**Works with sync and async.** One API handles synchronous cleanup, asynchronous cleanup, or mixed - no need to choose different functions.
-
-## Common Patterns
-
-### Database transactions
-
-```javascript
-await withDefer(async (defer) => {
-  const db = await connectDB();
-  defer(async () => await db.close());
-  
-  const tx = await db.beginTransaction();
-  let committed = false;
-  defer(async () => {
-    if (!committed) await tx.rollback();
-  });
-  
-  await tx.execute('INSERT INTO users VALUES (...)');
-  await tx.execute('UPDATE accounts SET balance = ...');
-  
-  await tx.commit();
-  committed = true;
-});
-```
-
-### File operations
-
-```javascript
-await withDefer((defer) => {
-  const input = fs.openSync('input.txt', 'r');
-  defer(() => fs.closeSync(input));
-  
-  const output = fs.openSync('output.txt', 'w');
-  defer(() => fs.closeSync(output));
-  
-  const buffer = Buffer.alloc(1024);
-  const bytesRead = fs.readSync(input, buffer);
-  fs.writeSync(output, buffer, 0, bytesRead);
-});
-```
-
-### Lock management
-
-```javascript
-await withDefer(async (defer) => {
-  await mutex.lock();
-  defer(async () => await mutex.unlock());
-  
-  // Critical section protected by lock
-  await performCriticalOperation();
-  // Lock automatically released even if operation throws
-});
-```
-
-### Test cleanup
-
-```javascript
-test('user workflow', async () => {
-  await withDefer(async (defer) => {
-    const user = await createTestUser();
-    defer(async () => await deleteUser(user.id));
-    
-    const session = await createSession(user);
-    defer(async () => await destroySession(session.id));
-    
-    // Test your code - cleanup happens automatically
-    expect(session.userId).toBe(user.id);
-  });
-});
-```
-
-### Multiple resources with dependencies
-
-```javascript
-await withDefer(async (defer) => {
-  const server = await startServer();
-  defer(async () => await server.stop());
-  
-  const client = await connectToServer(server);
-  defer(async () => await client.disconnect());
-  
-  const subscription = await client.subscribe('events');
-  defer(async () => await subscription.unsubscribe());
-  
-  await processEvents(subscription);
-  // Cleanup order: unsubscribe → disconnect → stop server
-});
-```
-
 ## API Reference
 
 ### withDefer(fn)
@@ -222,55 +133,6 @@ try {
 }
 ```
 
-### Runtime Validation
-
-The library validates inputs and provides helpful error messages:
-
-```javascript
-// ❌ Passing a Promise instead of a function
-defer(asyncFunction());
-// TypeError: defer() expects a function, not a Promise.
-// Use defer(() => yourAsyncFunction()) instead of defer(yourAsyncFunction())
-
-// ❌ Passing a non-function
-defer("cleanup");
-// TypeError: defer() expects a function
-
-// ✅ Correct usage
-defer(() => asyncFunction());
-defer(async () => await asyncFunction());
-```
-
-## TypeScript Support
-
-Full TypeScript support with type inference:
-
-```typescript
-import { withDefer, DeferFn, DeferCallback } from 'defer.js';
-
-// Return type automatically inferred as Promise<string>
-const result = await withDefer(async (defer) => {
-  defer(() => cleanup());
-  return "result";
-});
-
-// Use exported types for passing defer to functions
-async function acquireResource(defer: DeferFn) {
-  const resource = await acquire();
-  defer(async () => await release(resource));
-  return resource;
-}
-
-await withDefer(async (defer) => {
-  const res = await acquireResource(defer);
-  return await process(res);
-});
-```
-
-**Exported Types:**
-- `DeferCallback` - Type for cleanup functions: `() => any` (return values are ignored)
-- `DeferFn` - Type for the defer function itself: `(callback: DeferCallback) => void`
-
 ## Comparison with Go
 
 This library implements Go's `defer` pattern for JavaScript:
@@ -280,9 +142,6 @@ This library implements Go's `defer` pattern for JavaScript:
 - ✅ Executes on all exit paths (return, throw)
 - ✅ Return values from deferred functions are ignored
 - ✅ All deferred functions execute even if some fail
-
-**JavaScript difference:**
-- Code must be wrapped in `withDefer()` instead of using a language keyword
 
 ## License
 

@@ -1,7 +1,7 @@
 {
     "name": "with-defer",
     "version": "1.0.0",
-    "description": "Go-style defer functionality for JavaScript. Declare cleanup functions right next to resource acquisition.",
+    "description": "Go-style defer functionality for JavaScript. Declare cleanups right next to resource acquisition.",
     "scripts": {
         "build:cjs": "tsc -p tsconfig.cjs.json",
         "build:esm": "tsc",
